@@ -31,4 +31,4 @@ diagnose(dataset_name, df_train, df_test, model_relation)
 
 ## Output Plot
 
-![output plot](https://github.com/eklavyaj/RandomSplitDiagnostics/blob/main/Output/Abalone/WholeWeight%20~%20Height%20%2B%20LongestShell%20%2B%20Diameter.png)
+![WholeWeight ~ Height + LongestShell + Diameter_diagnose](https://user-images.githubusercontent.com/50804314/157613690-e3baef1d-73d2-4963-a1e3-09f42290821b.png)
