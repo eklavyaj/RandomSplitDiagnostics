@@ -28,7 +28,7 @@
 #' model.relation <- WholeWeight ~ Height + LongestShell + Diameter
 #'
 #' # function call
-#' diagnose_split(dataset.name, df.train, df.test, model.relation)
+#' diagnose(dataset.name, df.train, df.test, model.relation)
 #'
 #' # ---------------- Example 2 ----------------
 #'
@@ -45,14 +45,23 @@
 #' model.relation <- price ~ x:y:z + depth
 #'
 #' # function call
-#' diagnose_split(dataset.name, df.train, df.test, model.relation)
+#' diagnose(dataset.name, df.train, df.test, model.relation)
 #'
 #'
-diagnose_split <- function(dataset.name, df.train, df.test, model.relation) {
+diagnose <- function(dataset.name, df.train, df.test, model.relation) {
 
     dir.create("Output")
     dir.create(paste0("Output", "/", dataset.name))
+    if (!file.exists(paste0("Output", "/", dataset.name, "/Simulation_0"))){
+        dir.create(paste0("Output", "/", dataset.name, "/Simulation_0"))
+        n <- 0
+    } else {
+        dir_list <- list.dirs(paste0("Output", "/", dataset.name), full.names = FALSE, recursive = FALSE)
+        n <- max(as.numeric(gsub(".*?([0-9]+)", "\\1", dir_list))) + 1
+        dir.create(paste0("Output", "/", dataset.name, "/Simulation_", n))
+    }
 
+    dir <- paste0("Output", "/", dataset.name, "/Simulation_", n)
     response.var <- stringr::str_trim(strsplit(deparse(model.relation), "\\~")[[1]][1])
 
     n1 <- nrow(df.train)
@@ -65,8 +74,6 @@ diagnose_split <- function(dataset.name, df.train, df.test, model.relation) {
     df <- rbind(df.train, df.test)
     num.iterations <- 200
 
-    diagnose(dataset.name, num.iterations, df, split.percentage, response.var, model.relation, initial.scores)
+    diagnose_split(dataset.name, num.iterations, df, split.percentage, response.var, model.relation, initial.scores, dir)
 
 }
-
-

@@ -4,12 +4,12 @@
 \alias{get_mahalanobis_distance}
 \title{Obtain a Modified version of the Mahalnobis Distance between two populations}
 \usage{
-get_mahalanobis_distance(df1, df2)
+get_mahalanobis_distance(train, test)
 }
 \arguments{
-\item{df1}{Population Data Frame from which distance is to be measured}
+\item{train}{Population Data Frame from which distance is to be measured}
 
-\item{df2}{Population Data Frame for which distance is to be measured (variables should be same as df1)}
+\item{test}{Population Data Frame for which distance is to be measured (variables should be same as train)}
 }
 \value{
 A numerical value denoting the modified mahalanobis distance
