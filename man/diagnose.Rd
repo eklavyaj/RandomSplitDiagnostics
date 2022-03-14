@@ -4,25 +4,16 @@
 \alias{diagnose}
 \title{Diagnose the Random Split}
 \usage{
-diagnose(
-  dataset.name,
-  num.iterations,
-  df,
-  split.percentage,
-  response.var,
-  model.relation,
-  initial.scores,
-  dir
-)
+diagnose(dataset.name, df.train, df.test, model.relation)
 }
 \arguments{
 \item{dataset.name}{Name of the dataset (string)}
 
-\item{model.relation}{The Regression Model to be fitted on the training data}
-
 \item{df.train}{Train set corresponding to the initial split performed by the user}
 
 \item{df.test}{Test set corresponding to the initial split performed by the user}
+
+\item{model.relation}{The Regression Model to be fitted on the training data}
 }
 \value{
 \enumerate{
@@ -69,6 +60,5 @@ model.relation <- price ~ x:y:z + depth
 
 # function call
 diagnose(dataset.name, df.train, df.test, model.relation)
-
 
 }

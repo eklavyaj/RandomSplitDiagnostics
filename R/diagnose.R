@@ -47,7 +47,6 @@
 #' # function call
 #' diagnose(dataset.name, df.train, df.test, model.relation)
 #'
-#'
 diagnose <- function(dataset.name, df.train, df.test, model.relation) {
 
     dir.create("Output")

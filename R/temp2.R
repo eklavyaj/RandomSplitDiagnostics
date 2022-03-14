@@ -17,7 +17,6 @@
 # df.train <- abalone[s, ]
 # df.test <- abalone[-s, ]
 #
-#
 # model.relation <- WholeWeight ~ Height
 # model <- lm(model.relation, data = df.train)
 #
@@ -37,8 +36,8 @@
 # p1 <- ggplot(df.train, aes(Height, WholeWeight)) +
 #     geom_point(color = "#4E84C4")+
 #     geom_line(data = df.train, aes(x = Height, y = preds), color = "#D16103") +
-#     ggthemes::theme_fivethirtyeight() +
-#     theme(legend.position = "none", axis.title = element_text()) +
+#     theme_bw() +
+#     theme(legend.position = "none", axis.title = element_text(), plot.subtitle = element_text(color = "red"), axis.text = element_text(size = 13)) +
 #     labs(subtitle = paste("R-squared =", round(rsq.train, 3)),
 #          title = "Train Set - I",
 #          x = "Height",
@@ -49,8 +48,8 @@
 # p2 <- ggplot(df.test, aes(Height, WholeWeight)) +
 #     geom_point(color = "#4E84C4")+
 #     geom_line(data = df.test, aes(x = Height, y = preds), color = "#D16103") +
-#     ggthemes::theme_fivethirtyeight() +
-#     theme(legend.position = "none", axis.title = element_text()) +
+#     theme_bw() +
+#     theme(legend.position = "none", axis.title = element_text(), plot.subtitle = element_text(color = "red"), axis.text = element_text(size = 13)) +
 #     labs(subtitle = paste("R-squared =", round(rsq.test, 3)),
 #          title = "Test Set - I",
 #          x = "Height",
@@ -60,8 +59,8 @@
 # print(p1)
 # print(p2)
 #
-# ggsave("Rsq Plots/train_normal.png", plot = p1)
-# ggsave("Rsq Plots/test_normal.png", plot = p2)
+# ggsave("Rsq Plots/train_normal.eps", plot = p1)
+# ggsave("Rsq Plots/test_normal.eps", plot = p2)
 #
 # # ----------------------------------- rsq drop --------------------------------------
 #
@@ -90,8 +89,8 @@
 # p1 <- ggplot(df.train, aes(Height, WholeWeight)) +
 #     geom_point(color = "#4d7cb7")+
 #     geom_line(data = df.train, aes(x = Height, y = preds), color = "#FFA500") +
-#     ggthemes::theme_fivethirtyeight() +
-#     theme(legend.position = "none", axis.title = element_text()) +
+#     theme_bw() +
+#     theme(legend.position = "none", axis.title = element_text(), plot.subtitle = element_text(color = "red"), axis.text = element_text(size = 13)) +
 #     labs(subtitle = paste("R-squared =", round(rsq.train, 3)),
 #          title = "Train Set - II",
 #          x = "Height",
@@ -102,8 +101,8 @@
 # p2 <- ggplot(df.test, aes(Height, WholeWeight)) +
 #     geom_point(color = "#4d7cb7")+
 #     geom_line(data = df.test, aes(x = Height, y = preds), color = "#FFA500") +
-#     ggthemes::theme_fivethirtyeight() +
-#     theme(legend.position = "none", axis.title = element_text()) +
+#     theme_bw() +
+#     theme(legend.position = "none", axis.title = element_text(), plot.subtitle = element_text(color = "red"), axis.text = element_text(size = 13)) +
 #     labs(subtitle = paste("R-squared =", round(rsq.test, 3)),
 #          title = "Test Set - II",
 #          x = "Height",
@@ -113,7 +112,7 @@
 # print(p1)
 # print(p2)
 #
-# ggsave("Rsq Plots/train_drop.png", plot = p1)
-# ggsave("Rsq Plots/test_drop.png", plot = p2)
+# ggsave("Rsq Plots/train_drop.eps", plot = p1)
+# ggsave("Rsq Plots/test_drop.eps", plot = p2)
 #
 #

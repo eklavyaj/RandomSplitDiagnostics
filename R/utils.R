@@ -28,7 +28,7 @@ get_mahalanobis_distance <- function(train, test){
     d1 <- mean(mahalanobis(train, mu2, pooled_cov))
     d2 <- mean(mahalanobis(test, mu1, pooled_cov))
 
-    d <- abs(d2 - d1)
+    d <- d2 - d1
 
     return(d)
 
