@@ -59,8 +59,8 @@
 # print(p1)
 # print(p2)
 #
-# ggsave("Rsq Plots/train_normal.eps", plot = p1)
-# ggsave("Rsq Plots/test_normal.eps", plot = p2)
+# ggsave("Rsq Plots/train_normal.pdf", plot = p1)
+# ggsave("Rsq Plots/test_normal.pdf", plot = p2)
 #
 # # ----------------------------------- rsq drop --------------------------------------
 #
@@ -112,7 +112,7 @@
 # print(p1)
 # print(p2)
 #
-# ggsave("Rsq Plots/train_drop.eps", plot = p1)
-# ggsave("Rsq Plots/test_drop.eps", plot = p2)
+# ggsave("Rsq Plots/train_drop.pdf", plot = p1)
+# ggsave("Rsq Plots/test_drop.pdf", plot = p2)
 #
 #

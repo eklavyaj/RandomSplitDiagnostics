@@ -1,90 +1,46 @@
-# ------------------------------- helper functions -------------------------------
+get_distance <- function(train, test){
 
-#' Obtain a Modified version of the Mahalnobis Distance between two populations
-#'
-#' @param train Population Data Frame from which distance is to be measured
-#' @param test Population Data Frame for which distance is to be measured (variables should be same as train)
-#'
-#' @return A numerical value denoting the modified mahalanobis distance
-#' @export
-#'
-#' @examples
-get_mahalanobis_distance <- function(train, test){
+    num_cols <- unlist(lapply(train, is.numeric))
+    train <- train[, num_cols]
+    test <- test[, num_cols]
 
-    # mnb_dist <- sqrt(mean((mahalanobis(df2, colMeans(df1), cov(df1)))^2))
-    # return(mnb_dist)
+    n.train <- nrow(train)
+    n.test <- nrow(test)
 
-    n1 <- nrow(train)
-    n2 <- nrow(test)
+    cov.train <- cov(train)
+    cov.test <- cov(test)
 
-    cov1 <- cov(train)
-    cov2 <- cov(test)
+    mu.train <- colMeans(train)
+    mu.test <- colMeans(test)
 
-    mu1 <- colMeans(train)
-    mu2 <- colMeans(test)
+    pooled_cov <- matrix(((n.train-1)*cov.train + (n.test-1)*cov.test)/(n.train + n.test -2),
+                         ncol = ncol(train))
 
-    pooled_cov <- matrix(((n1-1)*cov1 + (n2-1)*cov2)/(n1 + n2 -2), ncol = ncol(train))
-
-    d1 <- mean(mahalanobis(train, mu2, pooled_cov))
-    d2 <- mean(mahalanobis(test, mu1, pooled_cov))
+    d1 <- mean(mahalanobis(train, mu.test, pooled_cov))
+    d2 <- mean(mahalanobis(test, mu.train, pooled_cov))
 
     d <- d2 - d1
 
     return(d)
-
-    # Hotelling T2
-    # n1 <- nrow(train)
-    # n2 <- nrow(test)
-    #
-    # cov1 <- cov(train)
-    # cov2 <- cov(test)
-    #
-    # mu1 <- colMeans(train)
-    # mu2 <- colMeans(test)
-    #
-    # pooled_cov <- matrix(((n1-1)*cov1 + (n2-1)*cov2)/(n1 + n2 -2), ncol = ncol(train))
-    # diff <- matrix(mu1 - mu2)
-    #
-    # t2 <- (n1*n2/(n1 + n2))*(t(diff) %*% pooled_cov %*% diff)
-    # return(t2)
-}
-
-
-#' Get the Residual Sum of Squares
-#'
-#' @param actual Actual values of response variable
-#' @param prediction Model predictions of response variable
-#'
-#' @return A numeric value denoting the residual sum of squares
-#' @export
-#'
-#' @examples
-#'
-get_RSS <- function(actual, prediction){
-
-    RSS <- sum((actual-prediction)**2)
-    return(RSS)
 }
 
 
 # get Akaike Information Criterion score for a model using RSS
-get_AIC <- function(actual, prediction, n, k){
-
-    # print("get_AIC")
-    rss <- get_RSS(actual, prediction)
-    k <- k + 1
-
-    if (n > 4000) {
-        aic <- n*log(rss/n) + 2*k
-    } else {
-        aic <- n*log(rss/n) + 2*k + (2*k*(k+1))/(n-k-1)
+get_performance <- function(actual, prediction, n, k, metric.performance = "Normalized AIC"){
+    performance <- 0
+    if (metric.performance == "Normalized AIC"){
+        rss <- sum((actual-prediction)**2)
+        k <- k + 1
+        performance <- log(rss/n) + 2*k/n
     }
-
-    return(aic)
+    return(performance)
 }
 
-# obtain the train AIC, test AIC, Mahalanobis distances for a given split.
-get_scores <- function(df.train, df.test, response.var, model.relation) {
+
+# obtain the train AIC, test AIC, Metric distance for a given split.
+get_scores <- function(df.train, df.test, model.relation, metric.performance = "Normalized AIC") {
+
+    response.var <- stringr::str_trim(strsplit(deparse(model.relation), "\\~")[[1]][1])
 
     model <- lm(model.relation, data = df.train)
     train.data <- as.data.frame(model.matrix(model))[-c(1)]
@@ -98,47 +54,32 @@ get_scores <- function(df.train, df.test, response.var, model.relation) {
 
     num.variables <- ncol(train.data) + 1
 
-    train.aic <- get_AIC(train.actual, train.predictions, nrow(df.train), num.variables) / nrow(df.train)
-    test.aic <- get_AIC(test.actual, test.predictions, nrow(df.test), num.variables) / nrow(df.test)
-
-    distance.wr <- get_mahalanobis_distance(train.data, test.data)
+    train.performance <- get_performance(train.actual, train.predictions, nrow(df.train),
+                                 num.variables, metric.performance)
+    test.performance <- get_performance(test.actual, test.predictions, nrow(df.test),
+                                num.variables, metric.performance)
 
     train.data[[response.var]] <- df.train[[response.var]]
     test.data[[response.var]] <- df.test[[response.var]]
-    d <- get_mahalanobis_distance(train.data, test.data)
+    distance <- get_distance(train.data, test.data)
 
-    return(c(train.aic, test.aic, distance.wr, d))
+    return(c(train.performance, test.performance, distance))
 
 }
 
+get_threshold <- function(d, alpha){
 
-get_plot <- function(n, df.melt, title, metric.performance, metric.distance) {
+    d.abs <- abs(d)
+    b <- length(d)
+    n1 <- floor(alpha*b/2)
+    n2 <- ceiling((1 - alpha/2)*b)
 
-    p <- ggplot2::ggplot(df.melt, ggplot2::aes(Distance, PerformanceValue, col = PerformanceType)) +
-        ggplot2::geom_text(label = rep(1:n, times = 2), size = 1.5) +
-        ggplot2::xlab(metric.distance) +
-        ggplot2::ylab(metric.performance) +
-        ggplot2::ggtitle(title) +
-        ggplot2::scale_color_manual(values = c( "#08bdba", "#da1e28",  "#ffb635", "#6929c4")) +
-        ggplot2::theme_bw() +
-        ggplot2::theme(panel.spacing = ggplot2::unit(0.5, "in"), legend.position = "bottom",
-                       axis.text = ggplot2::element_text(size = 6),
-                       axis.title = ggplot2::element_text(size = 7),
-                       legend.text = ggplot2::element_text(size = 6),
-                       title = ggplot2::element_text(size = 7) ) +
-        ggplot2::guides(colour = ggplot2::guide_legend(title = "Set", override.aes = list(size = 5, shape = 15)))
+    if(n1 == 0){
+        n1 <- 1
+    }
+    c1 <- sort(d.abs)[n1]
+    c2 <- sort(d.abs)[n2]
 
-    return(p)
+    return(c(c1, c2))
 }
-
-
-get_df_melt <- function(vec1, vec2, vec3) {
-
-    df <- data.frame(Distance = vec1, Train = vec2, Test = vec3)
-    df.melt <- reshape2::melt(df, id.vars = 'Distance',
-                              variable.name = 'PerformanceType',
-                              value.name = 'PerformanceValue')
-    return(df.melt)
-}
-
 

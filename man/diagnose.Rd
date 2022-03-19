@@ -2,39 +2,49 @@
 % Please edit documentation in R/diagnose.R
 \name{diagnose}
 \alias{diagnose}
-\title{Diagnose the Random Split}
+\title{Diagnose the random split}
 \usage{
-diagnose(dataset.name, df.train, df.test, model.relation)
+diagnose(
+  dataset.name,
+  df.train,
+  df.test,
+  flag.simulate = TRUE,
+  model.relation = "",
+  metric.performance = "Normalized AIC",
+  num.simulations = 200,
+  flag.find_threshold = TRUE,
+  num.bootstrap = 1000,
+  alpha = 0.05,
+  save.plots = TRUE,
+  output.dir = "Output"
+)
 }
 \arguments{
-\item{dataset.name}{Name of the dataset (string)}
+\item{dataset.name}{Name of the Dataset (String)}
 
-\item{df.train}{Train set corresponding to the initial split performed by the user}
+\item{df.train}{Train Partition (R DataFrame)}
 
-\item{df.test}{Test set corresponding to the initial split performed by the user}
+\item{df.test}{Test Partition (R DataFrame)}
 
-\item{model.relation}{The Regression Model to be fitted on the training data}
+\item{output.dir}{}
 }
 \value{
-\enumerate{
-\item Decision regarding the randomness of the split.
-\item Decision regarding the performance of the model.
-\item Supporting Plots of Mahalanobis Distance vs. Akaike Information Criterion.
-}
+
 }
 \description{
-Diagnose the Random Split
+Diagnose the random split
 }
 \examples{
 
-# ---------------- Example 1 ----------------
+# ------------------------- Example 1 ------------------------------
 
 # data preparation
 dataset.name <- "Abalone"
 data(abalone)
+split.percentage <- 0.8
 
 # intial random split of data
-s <- sample(x = 1:nrow(abalone), size = floor(nrow(abalone)*0.7), replace = F)
+s <- sample(x = 1:nrow(abalone), size = floor(nrow(abalone)*split.percentage), replace = F)
 df.train <- abalone[s, ]
 df.test <- abalone[-s, ]
 
@@ -42,16 +52,20 @@ df.test <- abalone[-s, ]
 model.relation <- WholeWeight ~ Height + LongestShell + Diameter
 
 # function call
-diagnose(dataset.name, df.train, df.test, model.relation)
+diagnose(dataset.name, df.train, df.test, flag.simulate = TRUE,
+ model.relation = model.relation, metric.performance = "Normalized AIC",
+  num.simulations = 200, flag.find_threshold = TRUE, num.bootstrap = 1000,
+   alpha = 0.05, save.plots = TRUE, output.dir = "Output")
 
-# ---------------- Example 2 ----------------
+# ------------------------- Example 2 ------------------------------
 
 # data preparation
 dataset.name <- "Diamonds"
 data(diamonds)
+split.percentage <- 0.8
 
 # intial random split of data
-s <- sample(x = 1:nrow(diamonds), size = floor(nrow(diamonds)*0.7), replace = F)
+s <- sample(x = 1:nrow(diamonds), size = floor(nrow(diamonds)*split.percentage), replace = F)
 df.train <- diamonds[s, ]
 df.test <- diamonds[-s, ]
 
@@ -59,6 +73,9 @@ df.test <- diamonds[-s, ]
 model.relation <- price ~ x:y:z + depth
 
 # function call
-diagnose(dataset.name, df.train, df.test, model.relation)
+diagnose(dataset.name, df.train, df.test, flag.simulate = TRUE,
+ model.relation = model.relation, metric.performance = "Normalized AIC",
+  num.simulations = 200, flag.find_threshold = TRUE, num.bootstrap = 1000,
+   alpha = 0.05, save.plots = TRUE, output.dir = "Output")
 
 }

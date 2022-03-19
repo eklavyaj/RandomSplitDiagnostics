@@ -1,0 +1,53 @@
+visualize_clusters <- function(df.scores,
+                               dataset.name,
+                               initial.scores,
+                               model.relation,
+                               save.plots = TRUE,
+                               output.dir,
+                               metric.performance = "Normalized AIC"){
+
+    # melt data on performance
+    df.scores.melt <- reshape2::melt(df.scores,
+                                     id.vars = "Distance",
+                                     value.name = "Performance")[c(1, 3)]
+
+    # scale data, and store center and scale values of distance variable
+    df.scores.melt.scaled <- scale(df.scores.melt)
+
+    # apply clustering algorithm: DBScan with eps = 0.4 (based on experimentation)
+    dbs <- fpc::dbscan(df.scores.melt.scaled, eps = 0.4, MinPts = 10)
+
+    # add cluster id to main data frame
+    df.scores.melt.new <- df.scores.melt
+    df.scores.melt.new$cluster <- dbs$cluster
+
+    df.scores.melt.new = df.scores.melt.new[df.scores.melt.new$cluster != 0, ]
+    # plot clusters
+    cluster.plot <- ggplot2::ggplot(df.scores.melt.new, ggplot2::aes(Distance, Performance,
+                                                                     color = as.factor(cluster))) +
+        ggplot2::geom_point()  +
+        ggplot2::geom_point(ggplot2::aes(x = initial.scores[3],
+                                         y = initial.scores[1],
+                                         color = 'Train (Given Split)'),
+                                         size = 5, shape = 18) +
+        ggplot2::geom_point(ggplot2::aes(x = initial.scores[3],
+                                         y = initial.scores[2],
+                                         color = 'Test (Given Split)'),
+                                         size = 5, shape = 18) +
+        ggplot2::theme_bw() +
+        ggplot2::labs(x = "Modified Mahalanobis Distance", y = metric.performance,
+                      title = "Cluster Plot",
+                      subtitle = paste(dataset.name, "with", deparse(model.relation))) +
+        ggplot2::guides(size = "none",
+                        shape = "none",
+                        colour = ggplot2::guide_legend(title = "Cluster"))
+
+    print(cluster.plot)
+
+    if (save.plots == TRUE){
+        filename <- paste0(output.dir, "/", dataset.name, "_cluster_plot.pdf")
+        ggplot2::ggsave(filename, plot = cluster.plot, bg = "white")
+        print(paste("Cluster Plot saved @", filename))
+    }
+
+}

@@ -1,26 +1,32 @@
-#' Diagnose the Random Split
+#' Diagnose the random split
 #'
-#' @param dataset.name Name of the dataset (string)
-#' @param df.train Train set corresponding to the initial split performed by the user
-#' @param df.test Test set corresponding to the initial split performed by the user
-#' @param model.relation The Regression Model to be fitted on the training data
+#' @param dataset.name Name of the Dataset (String)
+#' @param df.train Train Partition (R DataFrame)
+#' @param df.test Test Partition (R DataFrame)
+#' @param flag.simulate
+#' @param model.relation
+#' @param metric.performance
+#' @param num.simulations
+#' @param flag.find_threshold
+#' @param num.bootstrap
+#' @param alpha
+#' @param save.plots
+#' @param output.dir
 #'
 #' @return
-#' 1. Decision regarding the randomness of the split.
-#' 2. Decision regarding the performance of the model.
-#' 3. Supporting Plots of Mahalanobis Distance vs. Akaike Information Criterion.
 #' @export
 #'
 #' @examples
 #'
-#' # ---------------- Example 1 ----------------
+#' # ------------------------- Example 1 ------------------------------
 #'
 #' # data preparation
 #' dataset.name <- "Abalone"
 #' data(abalone)
+#' split.percentage <- 0.8
 #'
 #' # intial random split of data
-#' s <- sample(x = 1:nrow(abalone), size = floor(nrow(abalone)*0.7), replace = F)
+#' s <- sample(x = 1:nrow(abalone), size = floor(nrow(abalone)*split.percentage), replace = F)
 #' df.train <- abalone[s, ]
 #' df.test <- abalone[-s, ]
 #'
@@ -28,16 +34,20 @@
 #' model.relation <- WholeWeight ~ Height + LongestShell + Diameter
 #'
 #' # function call
-#' diagnose(dataset.name, df.train, df.test, model.relation)
+#' diagnose(dataset.name, df.train, df.test, flag.simulate = TRUE,
+#'  model.relation = model.relation, metric.performance = "Normalized AIC",
+#'   num.simulations = 200, flag.find_threshold = TRUE, num.bootstrap = 1000,
+#'    alpha = 0.05, save.plots = TRUE, output.dir = "Output")
 #'
-#' # ---------------- Example 2 ----------------
+#' # ------------------------- Example 2 ------------------------------
 #'
 #' # data preparation
 #' dataset.name <- "Diamonds"
 #' data(diamonds)
+#' split.percentage <- 0.8
 #'
 #' # intial random split of data
-#' s <- sample(x = 1:nrow(diamonds), size = floor(nrow(diamonds)*0.7), replace = F)
+#' s <- sample(x = 1:nrow(diamonds), size = floor(nrow(diamonds)*split.percentage), replace = F)
 #' df.train <- diamonds[s, ]
 #' df.test <- diamonds[-s, ]
 #'
@@ -45,34 +55,73 @@
 #' model.relation <- price ~ x:y:z + depth
 #'
 #' # function call
-#' diagnose(dataset.name, df.train, df.test, model.relation)
+#' diagnose(dataset.name, df.train, df.test, flag.simulate = TRUE,
+#'  model.relation = model.relation, metric.performance = "Normalized AIC",
+#'   num.simulations = 200, flag.find_threshold = TRUE, num.bootstrap = 1000,
+#'    alpha = 0.05, save.plots = TRUE, output.dir = "Output")
 #'
-diagnose <- function(dataset.name, df.train, df.test, model.relation) {
+diagnose <- function(dataset.name,
+                     df.train,
+                     df.test,
+                     flag.simulate = TRUE,
+                     model.relation = "",
+                     metric.performance = "Normalized AIC",
+                     num.simulations = 200,
+                     flag.find_threshold = TRUE,
+                     num.bootstrap = 1000,
+                     alpha = 0.05,
+                     save.plots = TRUE,
+                     output.dir = "Output") {
 
-    dir.create("Output")
-    dir.create(paste0("Output", "/", dataset.name))
-    if (!file.exists(paste0("Output", "/", dataset.name, "/Simulation_0"))){
-        dir.create(paste0("Output", "/", dataset.name, "/Simulation_0"))
-        n <- 0
-    } else {
-        dir_list <- list.dirs(paste0("Output", "/", dataset.name), full.names = FALSE, recursive = FALSE)
-        n <- max(as.numeric(gsub(".*?([0-9]+)", "\\1", dir_list))) + 1
-        dir.create(paste0("Output", "/", dataset.name, "/Simulation_", n))
+    if (save.plots == TRUE){
+
+        if (!file.exists(output.dir)){
+            dir.create(output.dir)
+        }
+
+        if(!file.exists(file.path(output.dir, dataset.name))){
+            dir.create(file.path(output.dir, dataset.name))
+        }
+
+        n.simulation <- length(list.files(file.path(output.dir, dataset.name))) + 1
+        dir.create(file.path(output.dir, dataset.name, n.simulation))
+
+
+        output.dir <- file.path(output.dir, dataset.name, n.simulation)
     }
 
-    dir <- paste0("Output", "/", dataset.name, "/Simulation_", n)
-    response.var <- stringr::str_trim(strsplit(deparse(model.relation), "\\~")[[1]][1])
+    print(output.dir)
 
-    n1 <- nrow(df.train)
-    n2 <- nrow(df.test)
-    n <- n1 + n2
-    split.percentage <- n1/n
+    if (flag.simulate == TRUE){
 
-    initial.scores <- get_scores(df.train, df.test, response.var, model.relation)
+        n.train <- nrow(df.train)
+        n.test <- nrow(df.test)
+        n.total <- n.train + n.test
+        split.percentage <- n.train/n.total
 
-    df <- rbind(df.train, df.test)
-    num.iterations <- 200
+        initial.scores <- get_scores(df.train, df.test, model.relation, metric.performance)
 
-    diagnose_split(dataset.name, num.iterations, df, split.percentage, response.var, model.relation, initial.scores, dir)
+        simulate(dataset.name,
+                 df.train,
+                 df.test,
+                 num.simulations,
+                 model.relation,
+                 split.percentage,
+                 initial.scores,
+                 save.plots,
+                 output.dir,
+                 metric.performance)
+
+    }
+
+    if (flag.find_threshold == TRUE){
+        find_threshold(dataset.name,
+                       df.train,
+                       df.test,
+                       num.bootstrap,
+                       alpha,
+                       save.plots,
+                       output.dir)
+    }
 
 }
