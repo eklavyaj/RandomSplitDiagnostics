@@ -7,7 +7,7 @@
 #' @param model.relation
 #' @param metric.performance
 #' @param num.simulations
-#' @param flag.find_threshold
+#' @param flag.visualize_threshold
 #' @param num.bootstrap
 #' @param alpha
 #' @param save.plots
@@ -19,7 +19,8 @@
 #' @examples
 #'
 #' # ------------------------- Example 1 ------------------------------
-#'
+#' # set.seed(19) # accepted
+#' # set.seed(20) # rejected
 #' # data preparation
 #' dataset.name <- "Abalone"
 #' data(abalone)
@@ -34,10 +35,9 @@
 #' model.relation <- WholeWeight ~ Height + LongestShell + Diameter
 #'
 #' # function call
-#' diagnose(dataset.name, df.train, df.test, flag.simulate = TRUE,
-#'  model.relation = model.relation, metric.performance = "Normalized AIC",
-#'   num.simulations = 200, flag.find_threshold = TRUE, num.bootstrap = 1000,
-#'    alpha = 0.05, save.plots = TRUE, output.dir = "Output")
+#' diagnose(dataset.name, df.train, df.test, model.relation = model.relation,
+#'  metric.performance = "Normalized AIC", num.simulations = 200,
+#'   alpha = 0.05, save.plots = TRUE, output.dir = "Output")
 #'
 #' # ------------------------- Example 2 ------------------------------
 #'
@@ -55,20 +55,16 @@
 #' model.relation <- price ~ x:y:z + depth
 #'
 #' # function call
-#' diagnose(dataset.name, df.train, df.test, flag.simulate = TRUE,
-#'  model.relation = model.relation, metric.performance = "Normalized AIC",
-#'   num.simulations = 200, flag.find_threshold = TRUE, num.bootstrap = 1000,
-#'    alpha = 0.05, save.plots = TRUE, output.dir = "Output")
+#' diagnose(dataset.name, df.train, df.test, model.relation = model.relation,
+#'  metric.performance = "Normalized AIC", num.simulations = 200,
+#'   alpha = 0.05, save.plots = TRUE, output.dir = "Output")
 #'
 diagnose <- function(dataset.name,
                      df.train,
                      df.test,
-                     flag.simulate = TRUE,
                      model.relation = "",
                      metric.performance = "Normalized AIC",
                      num.simulations = 200,
-                     flag.find_threshold = TRUE,
-                     num.bootstrap = 1000,
                      alpha = 0.05,
                      save.plots = TRUE,
                      output.dir = "Output") {
@@ -90,38 +86,41 @@ diagnose <- function(dataset.name,
         output.dir <- file.path(output.dir, dataset.name, n.simulation)
     }
 
+    if (model.relation != ""){
+
+        response.var <- stringr::str_trim(strsplit(deparse(model.relation), "\\~")[[1]][1])
+        train.response <- df.train[[response.var]]
+        test.response <- df.test[[response.var]]
+
+        df.train <- as.data.frame(model.matrix(model.relation, df.train))[-c(1)]
+        df.test <- as.data.frame(model.matrix(model.relation, df.test))[-c(1)]
+
+        df.train[[response.var]] <- train.response
+        df.test[[response.var]] <- test.response
+    } else {
+        return(FALSE)
+    }
+
     print(output.dir)
 
-    if (flag.simulate == TRUE){
+    n.train <- nrow(df.train)
+    n.test <- nrow(df.test)
+    n.total <- n.train + n.test
+    split.percentage <- n.train/n.total
 
-        n.train <- nrow(df.train)
-        n.test <- nrow(df.test)
-        n.total <- n.train + n.test
-        split.percentage <- n.train/n.total
+    initial.scores <- get_scores(df.train, df.test, model.relation, metric.performance)
 
-        initial.scores <- get_scores(df.train, df.test, model.relation, metric.performance)
+    simulate(dataset.name,
+             df.train,
+             df.test,
+             num.simulations,
+             model.relation,
+             split.percentage,
+             initial.scores,
+             alpha,
+             save.plots,
+             output.dir,
+             metric.performance)
 
-        simulate(dataset.name,
-                 df.train,
-                 df.test,
-                 num.simulations,
-                 model.relation,
-                 split.percentage,
-                 initial.scores,
-                 save.plots,
-                 output.dir,
-                 metric.performance)
-
-    }
-
-    if (flag.find_threshold == TRUE){
-        find_threshold(dataset.name,
-                       df.train,
-                       df.test,
-                       num.bootstrap,
-                       alpha,
-                       save.plots,
-                       output.dir)
-    }
 
 }

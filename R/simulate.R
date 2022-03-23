@@ -5,6 +5,7 @@ simulate <- function(dataset.name,
                      model.relation,
                      split.percentage,
                      initial.scores,
+                     alpha,
                      save.plots = TRUE,
                      output.dir,
                      metric.performance = "Normalized AIC"){
@@ -51,5 +52,14 @@ simulate <- function(dataset.name,
                        save.plots,
                        output.dir,
                        metric.performance)
+
+    visualize_threshold(dataset.name,
+                   distance,
+                   df.train,
+                   df.test,
+                   model.relation,
+                   alpha,
+                   save.plots,
+                   output.dir)
 
 }

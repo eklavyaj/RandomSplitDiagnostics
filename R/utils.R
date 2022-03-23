@@ -19,7 +19,7 @@ get_distance <- function(train, test){
     d1 <- mean(mahalanobis(train, mu.test, pooled_cov))
     d2 <- mean(mahalanobis(test, mu.train, pooled_cov))
 
-    d <- d2 - d1
+    d <- (d1 + d2)/2
 
     return(d)
 }
@@ -67,9 +67,8 @@ get_scores <- function(df.train, df.test, model.relation, metric.performance = "
 
 }
 
-get_threshold <- function(d, alpha){
+get_two_sided_threshold <- function(d, alpha){
 
-    d.abs <- abs(d)
     b <- length(d)
     n1 <- floor(alpha*b/2)
     n2 <- ceiling((1 - alpha/2)*b)
@@ -77,9 +76,18 @@ get_threshold <- function(d, alpha){
     if(n1 == 0){
         n1 <- 1
     }
-    c1 <- sort(d.abs)[n1]
-    c2 <- sort(d.abs)[n2]
+    c1 <- sort(d)[n1]
+    c2 <- sort(d)[n2]
 
     return(c(c1, c2))
+}
+
+get_one_sided_threshold <- function(d, alpha){
+
+    l <- length(d)
+    n <- ceiling((1 - alpha)*l)
+    c <- sort(d)[n]
+
+    return(c)
 }
 

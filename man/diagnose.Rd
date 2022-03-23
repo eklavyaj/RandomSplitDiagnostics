@@ -8,12 +8,9 @@ diagnose(
   dataset.name,
   df.train,
   df.test,
-  flag.simulate = TRUE,
   model.relation = "",
   metric.performance = "Normalized AIC",
   num.simulations = 200,
-  flag.find_threshold = TRUE,
-  num.bootstrap = 1000,
   alpha = 0.05,
   save.plots = TRUE,
   output.dir = "Output"
@@ -37,7 +34,8 @@ Diagnose the random split
 \examples{
 
 # ------------------------- Example 1 ------------------------------
-
+# set.seed(19) # accepted
+# set.seed(20) # rejected
 # data preparation
 dataset.name <- "Abalone"
 data(abalone)
@@ -52,10 +50,9 @@ df.test <- abalone[-s, ]
 model.relation <- WholeWeight ~ Height + LongestShell + Diameter
 
 # function call
-diagnose(dataset.name, df.train, df.test, flag.simulate = TRUE,
- model.relation = model.relation, metric.performance = "Normalized AIC",
-  num.simulations = 200, flag.find_threshold = TRUE, num.bootstrap = 1000,
-   alpha = 0.05, save.plots = TRUE, output.dir = "Output")
+diagnose(dataset.name, df.train, df.test, model.relation = model.relation,
+ metric.performance = "Normalized AIC", num.simulations = 200,
+  alpha = 0.05, save.plots = TRUE, output.dir = "Output")
 
 # ------------------------- Example 2 ------------------------------
 
@@ -73,9 +70,8 @@ df.test <- diamonds[-s, ]
 model.relation <- price ~ x:y:z + depth
 
 # function call
-diagnose(dataset.name, df.train, df.test, flag.simulate = TRUE,
- model.relation = model.relation, metric.performance = "Normalized AIC",
-  num.simulations = 200, flag.find_threshold = TRUE, num.bootstrap = 1000,
-   alpha = 0.05, save.plots = TRUE, output.dir = "Output")
+diagnose(dataset.name, df.train, df.test, model.relation = model.relation,
+ metric.performance = "Normalized AIC", num.simulations = 200,
+  alpha = 0.05, save.plots = TRUE, output.dir = "Output")
 
 }

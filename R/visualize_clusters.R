@@ -35,12 +35,19 @@ visualize_clusters <- function(df.scores,
                                          color = 'Test (Given Split)'),
                                          size = 5, shape = 18) +
         ggplot2::theme_bw() +
-        ggplot2::labs(x = "Modified Mahalanobis Distance", y = metric.performance,
+        ggplot2::labs(x = latex2exp::TeX("Distance $(\\Lambda)$"),
+                      y = metric.performance,
                       title = "Cluster Plot",
                       subtitle = paste(dataset.name, "with", deparse(model.relation))) +
         ggplot2::guides(size = "none",
                         shape = "none",
-                        colour = ggplot2::guide_legend(title = "Cluster"))
+                        colour = ggplot2::guide_legend(title = "Cluster")) +
+        ggplot2::theme(text = ggplot2::element_text(size = 8),
+                       plot.subtitle = ggplot2::element_text(size = 10),
+                       title = ggplot2::element_text(size = 12),
+                       legend.text = ggplot2::element_text(size = 10),
+                       axis.text = ggplot2::element_text(size = 7))
+
 
     print(cluster.plot)
 

@@ -24,14 +24,20 @@ visualize_simulation <- function(df.scores,
                                          y = initial.scores[2],
                                          colour = 'Test (Given Split)'),
                                          size = 5, shape = 18) +
-        ggplot2::labs(x = "Modified Mahalanobis Distance", y = metric.performance,
+        ggplot2::labs(x = latex2exp::TeX("Distance $(\\Lambda)$"),
+                      y = metric.performance,
                       title = "Simulation Plot",
                       subtitle = paste(dataset.name, "with", deparse(model.relation))) +
         ggplot2::scale_color_manual(values = c( "#08bdba", "#da1e28",  "#ffb635", "#6929c4")) +
         ggplot2::theme_bw() +
         ggplot2::guides(size = "none",
                         colour = ggplot2::guide_legend(title = "Set",
-                                                       override.aes = list(size = 3, shape = 16)))
+                                                       override.aes = list(size = 3, shape = 16))) +
+        ggplot2::theme(text = ggplot2::element_text(size = 8),
+                       plot.subtitle = ggplot2::element_text(size = 10),
+                       title = ggplot2::element_text(size = 12),
+                       legend.text = ggplot2::element_text(size = 10),
+                       axis.text = ggplot2::element_text(size = 7))
 
     print(simulation.plot)
 
