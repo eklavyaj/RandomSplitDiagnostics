@@ -37,6 +37,8 @@ simulate <- function(dataset.name,
                             Train = train.performance,
                             Test = test.performance)
 
+
+
     visualize_simulation(df.scores,
                          dataset.name,
                          initial.scores,
@@ -58,6 +60,7 @@ simulate <- function(dataset.name,
                    df.train,
                    df.test,
                    model.relation,
+                   initial.scores,
                    alpha,
                    save.plots,
                    output.dir)

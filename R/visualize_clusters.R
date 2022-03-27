@@ -28,11 +28,11 @@ visualize_clusters <- function(df.scores,
         ggplot2::geom_point()  +
         ggplot2::geom_point(ggplot2::aes(x = initial.scores[3],
                                          y = initial.scores[1],
-                                         color = 'Train (Given Split)'),
+                                         color = 'Train (Initial Split)'),
                                          size = 5, shape = 18) +
         ggplot2::geom_point(ggplot2::aes(x = initial.scores[3],
                                          y = initial.scores[2],
-                                         color = 'Test (Given Split)'),
+                                         color = 'Test (Initial Split)'),
                                          size = 5, shape = 18) +
         ggplot2::theme_bw() +
         ggplot2::labs(x = latex2exp::TeX("Distance $(\\Lambda)$"),
@@ -46,12 +46,13 @@ visualize_clusters <- function(df.scores,
                        plot.subtitle = ggplot2::element_text(size = 10),
                        title = ggplot2::element_text(size = 12),
                        legend.text = ggplot2::element_text(size = 10),
-                       axis.text = ggplot2::element_text(size = 7))
+                       axis.text = ggplot2::element_text(size = 7),
+                       legend.title = ggplot2::element_text(face = "bold"))
 
 
     print(cluster.plot)
 
-    if (save.plots == TRUE){
+    if (save.plots){
         filename <- paste0(output.dir, "/", dataset.name, "_cluster_plot.pdf")
         ggplot2::ggsave(filename, plot = cluster.plot, bg = "white")
         print(paste("Cluster Plot saved @", filename))

@@ -1,56 +1,22 @@
-# visualize_threshold <- function(dataset.name,
-#                            df.train,
-#                            df.test,
-#                            model.relation = "",
-#                            num.bootstrap = 1000,
-#                            alpha = 0.05,
-#                            save.plots = TRUE,
-#                            output.dir = "Output"){
-
 visualize_threshold <- function(dataset.name,
                                 d.vec,
                                 df.train,
                                 df.test,
                                 model.relation = "",
+                                initial.scores,
                                 alpha = 0.05,
                                 save.plots = TRUE,
                                 output.dir = "Output"){
 
-    initial.distance <- get_distance(df.train, df.test)
-
-    # n.train <- nrow(df.train)
-    # n.test <- nrow(df.test)
-    #
-    # d.vec <- rep(0, num.bootstrap)
-    #
-    # for (i in 1:num.bootstrap){
-    #
-    #     train.idx = sample.int(n.train, size = n.train, replace = TRUE)
-    #     df.train.resample <- df.train[train.idx, ]
-    #
-    #     test.idx = sample.int(n.test, size = n.test, replace = TRUE)
-    #     df.test.resample <- df.test[test.idx, ]
-    #
-    #     d <- get_distance(df.train.resample, df.test.resample)
-    #     d.vec[i] = d
-    # }
-
-    # thresholds <- get_two_sided_threshold(d.vec, alpha)
-    #
-    # c1 <- min(thresholds)
-    # c2 <- max(thresholds)
+    initial.distance <- initial.scores[3]
 
     c <- get_one_sided_threshold(d.vec, alpha)
 
-    # if (initial.distance >= c1 & initial.distance <= c2){
-    #     subtitle <- paste("Null Hypothesis with alpha =", alpha, "accepted since |c1| < |d| < |c2|")
-    # } else{
-    #     if (initial.distance <= c1){
-    #         subtitle <- paste("Null Hypothesis with alpha =", alpha, "rejected since |d| <= |c1|")
-    #     } else{
-    #         subtitle <- paste("Null Hypothesis with alpha =", alpha, "rejected since |d| >= |c2|")
-    #     }
-    # }
+    if (initial.distance >= c){
+        subtitle <- paste("Null Hypothesis Rejected")
+    } else{
+        subtitle <- paste("Null Hypothesis Accepted")
+    }
 
     df.distance <- data.frame(distance = d.vec)
 
@@ -63,6 +29,7 @@ visualize_threshold <- function(dataset.name,
 
     str1 <- paste("Threshold = ", round(c, 2))
     str2 <- paste("Initial Distance = ", round(initial.distance, 2))
+    caption <- paste(str1, ",",str2)
     threshold.plot <- density.plot +
         ggplot2::geom_area(data = df.to_fill[df.to_fill$x <= c, ],
                            ggplot2::aes(x = x, y = y),
@@ -84,11 +51,12 @@ visualize_threshold <- function(dataset.name,
         ggplot2::labs(x = latex2exp::TeX("Distance $(\\Lambda)$"),
                       y = "Density",
                       title = "Parameter Evaluation Plot" ,
-                      caption = paste(str1, ";",str2)) +
+                      subtitle = paste(subtitle, ':', caption)) +
         ggplot2::theme(plot.subtitle = ggplot2::element_text(color = "red", size = 9),
                        title = ggplot2::element_text(size = 12),
                        legend.text = ggplot2::element_text(size = 10),
-                       axis.text = ggplot2::element_text(size = 7))
+                       axis.text = ggplot2::element_text(size = 7),
+                       legend.title = ggplot2::element_text(face = "bold"))
 
 
     print(threshold.plot)

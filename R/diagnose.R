@@ -69,7 +69,7 @@ diagnose <- function(dataset.name,
                      save.plots = TRUE,
                      output.dir = "Output") {
 
-    if (save.plots == TRUE){
+    if (save.plots){
 
         if (!file.exists(output.dir)){
             dir.create(output.dir)
@@ -84,21 +84,6 @@ diagnose <- function(dataset.name,
 
 
         output.dir <- file.path(output.dir, dataset.name, n.simulation)
-    }
-
-    if (model.relation != ""){
-
-        response.var <- stringr::str_trim(strsplit(deparse(model.relation), "\\~")[[1]][1])
-        train.response <- df.train[[response.var]]
-        test.response <- df.test[[response.var]]
-
-        df.train <- as.data.frame(model.matrix(model.relation, df.train))[-c(1)]
-        df.test <- as.data.frame(model.matrix(model.relation, df.test))[-c(1)]
-
-        df.train[[response.var]] <- train.response
-        df.test[[response.var]] <- test.response
-    } else {
-        return(FALSE)
     }
 
     print(output.dir)

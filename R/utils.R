@@ -1,4 +1,5 @@
-get_distance <- function(train, test){
+# Get Distance Metric for given split
+calculate_distance <- function(train, test){
 
     num_cols <- unlist(lapply(train, is.numeric))
     train <- train[, num_cols]
@@ -25,8 +26,8 @@ get_distance <- function(train, test){
 }
 
 
-# get Akaike Information Criterion score for a model using RSS
-get_performance <- function(actual, prediction, n, k, metric.performance = "Normalized AIC"){
+# Get Model Performance
+calculate_performance <- function(actual, prediction, n, k, metric.performance = "Normalized AIC"){
     performance <- 0
     if (metric.performance == "Normalized AIC"){
         rss <- sum((actual-prediction)**2)
@@ -54,17 +55,27 @@ get_scores <- function(df.train, df.test, model.relation, metric.performance = "
 
     num.variables <- ncol(train.data) + 1
 
-    train.performance <- get_performance(train.actual, train.predictions, nrow(df.train),
-                                 num.variables, metric.performance)
-    test.performance <- get_performance(test.actual, test.predictions, nrow(df.test),
-                                num.variables, metric.performance)
+    train.performance <- calculate_performance(train.actual, train.predictions, nrow(df.train),
+                                         num.variables, metric.performance)
+    test.performance <- calculate_performance(test.actual, test.predictions, nrow(df.test),
+                                        num.variables, metric.performance)
 
     train.data[[response.var]] <- df.train[[response.var]]
     test.data[[response.var]] <- df.test[[response.var]]
-    distance <- get_distance(train.data, test.data)
+    distance <- calculate_distance(train.data, test.data)
 
     return(c(train.performance, test.performance, distance))
 
+}
+
+
+get_one_sided_threshold <- function(d, alpha){
+
+    l <- length(d)
+    n <- ceiling((1 - alpha)*l)
+    c <- sort(d)[n]
+
+    return(c)
 }
 
 get_two_sided_threshold <- function(d, alpha){
@@ -81,13 +92,3 @@ get_two_sided_threshold <- function(d, alpha){
 
     return(c(c1, c2))
 }
-
-get_one_sided_threshold <- function(d, alpha){
-
-    l <- length(d)
-    n <- ceiling((1 - alpha)*l)
-    c <- sort(d)[n]
-
-    return(c)
-}
-
