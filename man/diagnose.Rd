@@ -23,7 +23,17 @@ diagnose(
 
 \item{df.test}{Test Partition (R DataFrame)}
 
-\item{output.dir}{}
+\item{model.relation}{The relation used for regression model}
+
+\item{metric.performance}{The performance metric, usually Normalized AIC}
+
+\item{num.simulations}{Number of simulations, defaults to 200}
+
+\item{alpha}{The level of the test for visualize_threshold, default set to 0.05}
+
+\item{save.plots}{Saves plots in output.dir when set to TRUE}
+
+\item{output.dir}{The output directory the plots are saved to}
 }
 \value{
 
