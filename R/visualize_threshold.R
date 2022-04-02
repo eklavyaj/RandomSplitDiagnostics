@@ -64,7 +64,7 @@ visualize_threshold <- function(dataset.name,
 
     if (save.plots){
         filename <- paste0(output.dir, "/", dataset.name, "_threshold_plot.pdf")
-        ggplot2::ggsave(filename, plot = threshold.plot, bg = "white")
+        ggplot2::ggsave(filename, plot = threshold.plot, bg = "white", width = 7.08, height = 3.94)
         print(paste("Threshold Plot saved @", filename))
     }
 

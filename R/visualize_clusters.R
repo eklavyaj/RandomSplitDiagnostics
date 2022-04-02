@@ -54,7 +54,7 @@ visualize_clusters <- function(df.scores,
 
     if (save.plots){
         filename <- paste0(output.dir, "/", dataset.name, "_cluster_plot.pdf")
-        ggplot2::ggsave(filename, plot = cluster.plot, bg = "white")
+        ggplot2::ggsave(filename, plot = cluster.plot, bg = "white", width = 7.08, height = 3.94)
         print(paste("Cluster Plot saved @", filename))
     }
 
