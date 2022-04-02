@@ -3,12 +3,9 @@
 #' @param dataset.name Name of the Dataset (String)
 #' @param df.train Train Partition (R DataFrame)
 #' @param df.test Test Partition (R DataFrame)
-#' @param flag.simulate
 #' @param model.relation The relation used for regression model
 #' @param metric.performance The performance metric, usually Normalized AIC
 #' @param num.simulations Number of simulations, defaults to 200
-#' @param flag.visualize_threshold
-#' @param num.bootstrap
 #' @param alpha The level of the test for visualize_threshold, default set to 0.05
 #' @param save.plots Saves plots in output.dir when set to TRUE
 #' @param output.dir The output directory the plots are saved to
