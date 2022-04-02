@@ -31,7 +31,7 @@
 #' df.test <- abalone[-s, ]
 #'
 #' # defining model relation based on variables of data
-#' model.relation <- WholeWeight ~ Height + LongestShell + Diameter
+#' model.relation <- Rings ~ LongestShell + Diameter + Height
 #'
 #' # function call
 #' diagnose(dataset.name, df.train, df.test, model.relation = model.relation,
@@ -99,17 +99,18 @@ diagnose <- function(dataset.name,
     # calculating initial scores to plot on graphs
     initial.scores <- get_scores(df.train, df.test, model.relation, metric.performance)
 
-    simulate(dataset.name,
-             df.train,
-             df.test,
-             num.simulations,
-             model.relation,
-             split.percentage,
-             initial.scores,
-             alpha,
-             save.plots,
-             output.dir,
-             metric.performance)
+    run_simulations(dataset.name,
+                    df.train,
+                     df.test,
+                     num.simulations,
+                     model.relation,
+                     split.percentage,
+                     initial.scores,
+                     alpha,
+                     save.plots,
+                     output.dir,
+                     metric.performance)
 
 
 }
+

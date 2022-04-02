@@ -1,14 +1,14 @@
-simulate <- function(dataset.name,
-                     df.train,
-                     df.test,
-                     num.simulations,
-                     model.relation,
-                     split.percentage,
-                     initial.scores,
-                     alpha,
-                     save.plots = TRUE,
-                     output.dir,
-                     metric.performance = "Normalized AIC"){
+run_simulations <- function(dataset.name,
+                            df.train,
+                            df.test,
+                            num.simulations,
+                            model.relation,
+                            split.percentage,
+                            initial.scores,
+                            alpha,
+                            save.plots = TRUE,
+                            output.dir,
+                            metric.performance = "Normalized AIC"){
 
     df <- rbind(df.train, df.test)
     n <- nrow(df)
