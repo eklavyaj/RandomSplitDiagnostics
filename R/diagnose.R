@@ -11,6 +11,8 @@
 #' @param output.dir The output directory the plots are saved to
 #'
 #' @return
+#'
+#'
 #' @export
 #'
 #' @examples
@@ -66,6 +68,8 @@ diagnose <- function(dataset.name,
                      save.plots = TRUE,
                      output.dir = "Output") {
 
+
+    # creating directories if required
     if (save.plots){
 
         if (!file.exists(output.dir)){
@@ -83,6 +87,8 @@ diagnose <- function(dataset.name,
         output.dir <- file.path(output.dir, dataset.name, n.simulation)
     }
 
+
+
     print(output.dir)
 
     n.train <- nrow(df.train)
@@ -90,6 +96,7 @@ diagnose <- function(dataset.name,
     n.total <- n.train + n.test
     split.percentage <- n.train/n.total
 
+    # calculating initial scores to plot on graphs
     initial.scores <- get_scores(df.train, df.test, model.relation, metric.performance)
 
     simulate(dataset.name,
