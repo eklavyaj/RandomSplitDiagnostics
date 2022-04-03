@@ -1,3 +1,17 @@
+#' Title
+#'
+#' @param dataset.name Name of the Dataset (String)
+#' @param d.vec Vector containing the mahalanobis distance based metric across different train-test splits
+#' @param df.train Train Partition (R DataFrame)
+#' @param df.test Test Partition (R DataFrame)
+#' @param model.relation The relation used for regression model
+#' @param initial.scores The performance metric value for the given initial train-test split
+#' @param alpha The level of the test for visualize_threshold, default set to 0.05
+#' @param save.plots Saves plots in output.dir when set to TRUE
+#' @param output.dir The path to output directory the plots are saved to
+#'
+#' @return
+#'
 visualize_threshold <- function(dataset.name,
                                 d.vec,
                                 df.train,
@@ -12,6 +26,7 @@ visualize_threshold <- function(dataset.name,
 
     c <- get_one_sided_threshold(d.vec, alpha)
 
+    # accept or reject null hypothesis based on above gotten threshold value
     if (initial.distance >= c){
         subtitle <- paste("Null Hypothesis Rejected")
     } else{

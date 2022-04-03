@@ -1,3 +1,15 @@
+#' Title
+#'
+#' @param df.scores Dataframe consisting of metric performance scores for different train-test splits
+#' @param dataset.name Name of the Dataset (String)
+#' @param initial.scores The performance metric value for the given initial train-test split
+#' @param model.relation The relation used for regression model
+#' @param save.plots Saves plots in output.dir when set to TRUE
+#' @param output.dir The path to output directory the plots are saved to
+#' @param metric.performance The performance metric, usually Normalized AIC
+#'
+#' @return
+#'
 visualize_simulation <- function(df.scores,
                                  dataset.name,
                                  initial.scores,
