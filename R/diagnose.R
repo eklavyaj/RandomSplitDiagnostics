@@ -73,7 +73,7 @@ diagnose <- function(dataset.name,
                      output.dir = "Output") {
 
     # validating metric.performance input values
-    if (metric.performance != "Normalized AIC" && metric.performance != "R Squared" ){
+    if (model.relation != "" && metric.performance != "Normalized AIC" && metric.performance != "R Squared" ){
         stop("Error in metric.performance needs to be set to Normalized AIC or R Squared")
     }
 
@@ -82,30 +82,32 @@ diagnose <- function(dataset.name,
         stop("Error in value of alpha needs to be in the range 0 <= alpha <=  1")
     }
 
-    # validating model.relation response variable input values
-    response.var <- stringr::str_trim(strsplit(deparse(model.relation), "\\~")[[1]][1])
-    if(is.null(df.test[[response.var]]) || is.null(df.train[[response.var]])){
-        stop("Error in provided response variable in model.relation doesn't exist in test/train dataframe")
+    if(model.relation != ""){
+        # validating model.relation response variable input values
+        response.var <- stringr::str_trim(strsplit(deparse(model.relation), "\\~")[[1]][1])
+        if(is.null(df.test[[response.var]]) || is.null(df.train[[response.var]])){
+            stop("Error in provided response variable in model.relation doesn't exist in test/train dataframe")
+        }
+
+        # validating model.relation variable input values
+        tryCatch(
+            expr = {
+                model.matrix(model.relation, df.test)
+            },
+            error = function(e){
+                stop(e)
+            }
+        )
+
+        tryCatch(
+            expr = {
+                model.matrix(model.relation, df.train)
+            },
+            error = function(e){
+                stop(e)
+            }
+        )
     }
-
-    # validating model.relation variable input values
-    tryCatch(
-        expr = {
-            model.matrix(model.relation, df.test)
-        },
-        error = function(e){
-            stop(e)
-        }
-    )
-
-    tryCatch(
-        expr = {
-            model.matrix(model.relation, df.train)
-        },
-        error = function(e){
-            stop(e)
-        }
-    )
 
     # creating directories if required
     if (save.plots){
@@ -125,20 +127,32 @@ diagnose <- function(dataset.name,
         output.dir <- file.path(output.dir, dataset.name, n.simulation)
     }
 
-
-
-    print(output.dir)
-
     # calculating split.percentage for given input split
     n.train <- nrow(df.train)
     n.test <- nrow(df.test)
     n.total <- n.train + n.test
     split.percentage <- n.train/n.total
 
-    # calculating initial scores to plot on graphs
-    initial.scores <- get_scores(df.train, df.test, model.relation, metric.performance)
+    ncol.train <- ncol(df.train)
+    ncol.test <- ncol(df.test)
 
-    simulate(dataset.name,
+    if(ncol.train != ncol.test){
+        stop("Error in columns of train and test are unequal")
+    }
+
+    # calculating table data
+    table.data <- c(n.total, ncol.train)
+
+    # calculating initial scores to plot on graphs
+    if(model.relation != ""){
+        initial.scores <- get_scores(df.train, df.test, model.relation, metric.performance)
+    }
+    else{
+        initial.dist <- calculate_distance(df.train, df.test)
+        initial.scores <- c(0,0,initial.dist)
+    }
+
+    split.conclusion <- simulate(dataset.name,
              df.train,
              df.test,
              num.simulations,
@@ -151,4 +165,27 @@ diagnose <- function(dataset.name,
              metric.performance)
 
 
+    if(model.relation != ""){
+        table.data <- c(table.data, round(initial.scores[3], 3), deparse(model.relation), metric.performance, round(initial.scores[1], 3), round(initial.scores[2], 3), split.conclusion)
+        table.rows <- c('No. of rows in dataset','No. of columns in dataset','Mahalanobis distance based metric for given split','Model Relation','Model Performance metric','Model Performance for given train split','Model performance for given test split','Split Conclusion')
+        table.data <- data.frame(
+            Attribute = table.rows,
+            Value = table.data
+        )
+    }
+    else{
+        table.data <- c(table.data, round(initial.scores[3], 3), split.conclusion)
+        table.rows <- c('No. of rows in dataset','No. of columns in dataset','Mahalanobis distance based metric for given split','Split Conclusion')
+        table.data <- data.frame(
+            Attribute = table.rows,
+            Value = table.data
+        )
+    }
+
+    if (save.plots){
+        filename <- paste0(output.dir, "/", dataset.name, "_stats.csv")
+        write.csv(table.data, file = filename, row.names = FALSE)
+    }
+
+    print(table.data)
 }

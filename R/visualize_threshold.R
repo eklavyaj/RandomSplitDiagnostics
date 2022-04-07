@@ -28,8 +28,10 @@ visualize_threshold <- function(dataset.name,
 
     # accept or reject null hypothesis based on above gotten threshold value
     if (initial.distance >= c){
+        split.conclusion <- "Rejected"
         subtitle <- paste("Null Hypothesis Rejected")
     } else{
+        split.conclusion <- "Accepted"
         subtitle <- paste("Null Hypothesis Accepted")
     }
 
@@ -83,4 +85,5 @@ visualize_threshold <- function(dataset.name,
         print(paste("Threshold Plot saved @", filename))
     }
 
+    return(split.conclusion)
 }

@@ -21,7 +21,7 @@ simulate <- function(dataset.name,
                      num.simulations,
                      model.relation,
                      split.percentage,
-                     initial.scores,
+                     initial.scores = c(),
                      alpha,
                      save.plots = TRUE,
                      output.dir,
@@ -43,45 +43,65 @@ simulate <- function(dataset.name,
         df.train.temp <- df[s, ]
         df.test.temp <- df[-s, ]
 
-        scores <- get_scores(df.train.temp, df.test.temp, model.relation, metric.performance)
+        if(model.relation == ""){
+            dist <- calculate_distance(df.train.temp, df.test.temp)
+            distance <- c(distance, dist)
 
-        train.performance <- c(train.performance, scores[1])
-        test.performance <- c(test.performance, scores[2])
-        distance <- c(distance, scores[3])
+        }
+
+        else{
+            scores <- get_scores(df.train.temp, df.test.temp, model.relation, metric.performance)
+            train.performance <- c(train.performance, scores[1])
+            test.performance <- c(test.performance, scores[2])
+            distance <- c(distance, scores[3])
+        }
+    }
+
+    if(model.relation == ""){
+        split.conclusion <- visualize_threshold(dataset.name,
+                            distance,
+                            df.train,
+                            df.test,
+                            model.relation,
+                            initial.scores,
+                            alpha,
+                            save.plots,
+                            output.dir)
+    }
+
+    else{
+        df.scores <- data.frame(Distance = distance,
+                                Train = train.performance,
+                                Test = test.performance)
+
+        visualize_simulation(df.scores,
+                             dataset.name,
+                             initial.scores,
+                             model.relation,
+                             save.plots,
+                             output.dir,
+                             metric.performance)
+
+        visualize_clusters(df.scores,
+                           dataset.name,
+                           initial.scores,
+                           model.relation,
+                           save.plots,
+                           output.dir,
+                           metric.performance)
+
+        split.conclusion <- visualize_threshold(dataset.name,
+                            distance,
+                            df.train,
+                            df.test,
+                            model.relation,
+                            initial.scores,
+                            alpha,
+                            save.plots,
+                            output.dir)
 
     }
 
-
-    df.scores <- data.frame(Distance = distance,
-                            Train = train.performance,
-                            Test = test.performance)
-
-
-
-    visualize_simulation(df.scores,
-                         dataset.name,
-                         initial.scores,
-                         model.relation,
-                         save.plots,
-                         output.dir,
-                         metric.performance)
-
-    visualize_clusters(df.scores,
-                       dataset.name,
-                       initial.scores,
-                       model.relation,
-                       save.plots,
-                       output.dir,
-                       metric.performance)
-
-    visualize_threshold(dataset.name,
-                   distance,
-                   df.train,
-                   df.test,
-                   model.relation,
-                   initial.scores,
-                   alpha,
-                   save.plots,
-                   output.dir)
+    return(split.conclusion)
 
 }
