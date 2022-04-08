@@ -30,7 +30,7 @@
 #' df.test <- abalone[-s, ]
 #'
 #' # defining model relation based on variables of data
-#' model.relation <- WholeWeight ~ Height + LongestShell + Diameter
+#' model.relation <- Rings ~ LongestShell + Diameter + Height
 #'
 #' # function call
 #' diagnose(dataset.name, df.train, df.test, model.relation = model.relation,
@@ -152,6 +152,7 @@ diagnose <- function(dataset.name,
         initial.scores <- c(0,0,initial.dist)
     }
 
+
     split.conclusion <- simulate(dataset.name,
              df.train,
              df.test,
@@ -189,3 +190,4 @@ diagnose <- function(dataset.name,
 
     print(table.data)
 }
+
