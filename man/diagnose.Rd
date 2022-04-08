@@ -33,10 +33,10 @@ diagnose(
 
 \item{save.plots}{Saves plots in output.dir when set to TRUE}
 
-\item{output.dir}{The output directory the plots are saved to}
+\item{output.dir}{The path to output directory the plots are saved to}
 }
 \value{
-
+The following three plots are plotted:
 }
 \description{
 Diagnose the random split
