@@ -44,24 +44,26 @@ Diagnose the random split
 \examples{
 
 # ------------------------- Example 1 ------------------------------
-# set.seed(19) # accepted
-# set.seed(20) # rejected
 # data preparation
 dataset.name <- "Abalone"
 data(abalone)
 split.percentage <- 0.8
 
-# intial random split of data
+# initial random split of data
 s <- sample(x = 1:nrow(abalone), size = floor(nrow(abalone)*split.percentage), replace = F)
 df.train <- abalone[s, ]
 df.test <- abalone[-s, ]
 
 # defining model relation based on variables of data
-model.relation <- WholeWeight ~ Height + LongestShell + Diameter
+model.relation <- Rings ~ LongestShell + Diameter + Height
 
 # function call
 diagnose(dataset.name, df.train, df.test, model.relation = model.relation,
  metric.performance = "Normalized AIC", num.simulations = 200,
+  alpha = 0.05, save.plots = TRUE, output.dir = "Output")
+
+# without model relation
+diagnose(dataset.name, df.train, df.test, num.simulations = 200,
   alpha = 0.05, save.plots = TRUE, output.dir = "Output")
 
 # ------------------------- Example 2 ------------------------------
@@ -71,7 +73,7 @@ dataset.name <- "Diamonds"
 data(diamonds)
 split.percentage <- 0.8
 
-# intial random split of data
+# initial random split of data
 s <- sample(x = 1:nrow(diamonds), size = floor(nrow(diamonds)*split.percentage), replace = F)
 df.train <- diamonds[s, ]
 df.test <- diamonds[-s, ]
@@ -84,4 +86,7 @@ diagnose(dataset.name, df.train, df.test, model.relation = model.relation,
  metric.performance = "Normalized AIC", num.simulations = 200,
   alpha = 0.05, save.plots = TRUE, output.dir = "Output")
 
+# without model relation
+diagnose(dataset.name, df.train, df.test, num.simulations = 200,
+  alpha = 0.05, save.plots = TRUE, output.dir = "Output")
 }

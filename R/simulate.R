@@ -1,4 +1,4 @@
-#' Title
+#' Title Simulates random splits and performs hypothesis testing
 #'
 #' @param dataset.name Name of the Dataset (String)
 #' @param df.train Train Partition (R DataFrame)
@@ -15,7 +15,8 @@
 #' @return
 #'
 #'
-simulate <- function(dataset.name,
+simulate <- function(n.simulation,
+                     dataset.name,
                      df.train,
                      df.test,
                      num.simulations,
@@ -46,10 +47,7 @@ simulate <- function(dataset.name,
         if(model.relation == ""){
             dist <- calculate_distance(df.train.temp, df.test.temp)
             distance <- c(distance, dist)
-
-        }
-
-        else{
+        } else{
             scores <- get_scores(df.train.temp, df.test.temp, model.relation, metric.performance)
             train.performance <- c(train.performance, scores[1])
             test.performance <- c(test.performance, scores[2])
@@ -58,7 +56,7 @@ simulate <- function(dataset.name,
     }
 
     if(model.relation == ""){
-        split.conclusion <- visualize_threshold(dataset.name,
+        p <- visualize_threshold(dataset.name,
                             distance,
                             df.train,
                             df.test,
@@ -67,6 +65,12 @@ simulate <- function(dataset.name,
                             alpha,
                             save.plots,
                             output.dir)
+
+        if (save.plots){
+            filename <- paste0(output.dir, "/", dataset.name,"_", n.simulation, ".pdf")
+            ggplot2::ggsave(filename, plot = p, bg = "white", width = 5, height = 4)
+            print(paste("Plot for dataset:", dataset.name, "saved @", filename))
+        }
     }
 
     else{
@@ -74,7 +78,7 @@ simulate <- function(dataset.name,
                                 Train = train.performance,
                                 Test = test.performance)
 
-        visualize_simulation(df.scores,
+        p1 <- visualize_simulation(df.scores,
                              dataset.name,
                              initial.scores,
                              model.relation,
@@ -82,15 +86,7 @@ simulate <- function(dataset.name,
                              output.dir,
                              metric.performance)
 
-        visualize_clusters(df.scores,
-                           dataset.name,
-                           initial.scores,
-                           model.relation,
-                           save.plots,
-                           output.dir,
-                           metric.performance)
-
-        split.conclusion <- visualize_threshold(dataset.name,
+        p2 <- visualize_threshold(dataset.name,
                             distance,
                             df.train,
                             df.test,
@@ -100,8 +96,25 @@ simulate <- function(dataset.name,
                             save.plots,
                             output.dir)
 
+        p <- ggpubr::ggarrange(p1, p2, ncol = 2, legend = "right")
+
+        if (save.plots){
+            filename <- paste0(output.dir, "/", dataset.name,"_", n.simulation, ".pdf")
+            ggplot2::ggsave(filename, plot = p, bg = "white", width = 10, height = 4)
+            print(paste("Plot for", dataset.name, "dataset saved @", filename))
+        }
+
     }
 
-    return(split.conclusion)
+    initial.distance <- initial.scores[3]
+    c <- get_one_sided_threshold(distance, alpha)
+
+    if (initial.distance > c){
+        split.conclusion <- "Rejected"
+    } else{
+        split.conclusion <- "Accepted"
+    }
+
+    return(c(c, split.conclusion))
 
 }

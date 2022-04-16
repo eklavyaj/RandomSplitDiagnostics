@@ -46,38 +46,10 @@ calculate_performance <- function(actual, prediction, n, k, metric.performance =
         tss <- sum((act - mean(actual))**2)
         performance <- 1 - rss/tss
     }
-  
+
     return(performance)
 }
 
-# get_scores <- function(df.train, df.test, model.relation, metric.performance = "Normalized AIC") {
-#
-#     response.var <- stringr::str_trim(strsplit(deparse(model.relation), "\\~")[[1]][1])
-#
-#     model <- nnet::multinom(model.relation, data = df.train)
-#     train.data <- as.data.frame(model.matrix(model))[-c(1)]
-#     test.data <- as.data.frame(model.matrix(model.relation, df.test))[-c(1)]
-#
-#     train.predictions <- predict(model, df.train)
-#     train.actual <- df.train[[response.var]]
-#
-#     test.predictions <- predict(model, df.test)
-#     test.actual <- df.test[[response.var]]
-#
-#     num.variables <- ncol(train.data) + 1
-#
-#     train.performance <- calculate_performance(train.actual, train.predictions, nrow(df.train),
-#                                                num.variables, metric.performance)
-#     test.performance <- calculate_performance(test.actual, test.predictions, nrow(df.test),
-#                                               num.variables, metric.performance)
-#
-#     train.data[[response.var]] <- df.train[[response.var]]
-#     test.data[[response.var]] <- df.test[[response.var]]
-#     distance <- calculate_distance(train.data, test.data)
-#
-#     return(c(train.performance, test.performance, distance))
-#
-# }
 
 # obtain the train AIC, test AIC, Metric distance for a given split.
 get_scores <- function(df.train, df.test, model.relation, metric.performance = "Normalized AIC") {
@@ -139,3 +111,5 @@ get_two_sided_threshold <- function(d, alpha){
 
     return(c(c1, c2))
 }
+
+# get_pval <- function()

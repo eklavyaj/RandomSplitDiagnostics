@@ -17,14 +17,12 @@
 #' @examples
 #'
 #' # ------------------------- Example 1 ------------------------------
-#' # set.seed(19) # accepted
-#' # set.seed(20) # rejected
 #' # data preparation
 #' dataset.name <- "Abalone"
 #' data(abalone)
 #' split.percentage <- 0.8
 #'
-#' # intial random split of data
+#' # initial random split of data
 #' s <- sample(x = 1:nrow(abalone), size = floor(nrow(abalone)*split.percentage), replace = F)
 #' df.train <- abalone[s, ]
 #' df.test <- abalone[-s, ]
@@ -37,10 +35,9 @@
 #'  metric.performance = "Normalized AIC", num.simulations = 200,
 #'   alpha = 0.05, save.plots = TRUE, output.dir = "Output")
 #'
-#' #function call with metric.performance as R Squared, alpha set to 0.06, 400 simulations, unsaved plots and model.relation for regression as WholeWeight ~ LongestShell + Diameter
-#' diagnose(dataset.name, df.train, df.test, model.relation = WholeWeight ~ LongestShell + Diameter,
-#'  metric.performance = "R Squared", num.simulations = 400,
-#'   alpha = 0.06, save.plots = FALSE, output.dir = "Output")
+#' # without model relation
+#' diagnose(dataset.name, df.train, df.test, num.simulations = 200,
+#'   alpha = 0.05, save.plots = TRUE, output.dir = "Output")
 #'
 #' # ------------------------- Example 2 ------------------------------
 #'
@@ -49,7 +46,7 @@
 #' data(diamonds)
 #' split.percentage <- 0.8
 #'
-#' # intial random split of data
+#' # initial random split of data
 #' s <- sample(x = 1:nrow(diamonds), size = floor(nrow(diamonds)*split.percentage), replace = F)
 #' df.train <- diamonds[s, ]
 #' df.test <- diamonds[-s, ]
@@ -62,6 +59,9 @@
 #'  metric.performance = "Normalized AIC", num.simulations = 200,
 #'   alpha = 0.05, save.plots = TRUE, output.dir = "Output")
 #'
+#' # without model relation
+#' diagnose(dataset.name, df.train, df.test, num.simulations = 200,
+#'   alpha = 0.05, save.plots = TRUE, output.dir = "Output")
 diagnose <- function(dataset.name,
                      df.train,
                      df.test,
@@ -127,6 +127,8 @@ diagnose <- function(dataset.name,
         output.dir <- file.path(output.dir, dataset.name, n.simulation)
     }
 
+    print("Running...")
+
     # calculating split.percentage for given input split
     n.train <- nrow(df.train)
     n.test <- nrow(df.test)
@@ -141,7 +143,7 @@ diagnose <- function(dataset.name,
     }
 
     # calculating table data
-    table.data <- c(n.total, ncol.train)
+    table.data <- c(dataset.name, n.total, ncol.train)
 
     # calculating initial scores to plot on graphs
     if(model.relation != ""){
@@ -153,30 +155,48 @@ diagnose <- function(dataset.name,
     }
 
 
-    split.conclusion <- simulate(dataset.name,
-             df.train,
-             df.test,
-             num.simulations,
-             model.relation,
-             split.percentage,
-             initial.scores,
-             alpha,
-             save.plots,
-             output.dir,
-             metric.performance)
+    results <- simulate(n.simulation,
+                        dataset.name,
+                        df.train,
+                        df.test,
+                        num.simulations,
+                        model.relation,
+                        split.percentage,
+                        initial.scores,
+                        alpha,
+                        save.plots,
+                        output.dir,
+                        metric.performance)
 
+
+    threshold <- as.numeric(results[1])
+    split.conclusion <- results[2]
 
     if(model.relation != ""){
-        table.data <- c(table.data, round(initial.scores[3], 3), deparse(model.relation), metric.performance, round(initial.scores[1], 3), round(initial.scores[2], 3), split.conclusion)
-        table.rows <- c('No. of rows in dataset','No. of columns in dataset','Mahalanobis distance based metric for given split','Model Relation','Model Performance metric','Model Performance for given train split','Model performance for given test split','Split Conclusion')
+        table.data <- c(table.data, round(initial.scores[3], 3), round(threshold, 3), deparse(model.relation), metric.performance, round(initial.scores[1], 3), round(initial.scores[2], 3), split.conclusion)
+        table.rows <- c('Dataset',
+                        'No. of Rows in Dataset',
+                        'No. of Columns in Dataset',
+                        'Distance Metric for Initial Split',
+                        'Rejection Threshold (c)',
+                        'Model Relation',
+                        'Model Performance Metric',
+                        'Model Performance for Initial Train Split',
+                        'Model Performance for Initial Test Split',
+                        'Split Conclusion')
         table.data <- data.frame(
             Attribute = table.rows,
             Value = table.data
         )
     }
     else{
-        table.data <- c(table.data, round(initial.scores[3], 3), split.conclusion)
-        table.rows <- c('No. of rows in dataset','No. of columns in dataset','Mahalanobis distance based metric for given split','Split Conclusion')
+        table.data <- c(table.data, round(initial.scores[3], 3), round(threshold, 3), split.conclusion)
+        table.rows <- c('Dataset',
+                        'No. of Rows in Dataset',
+                        'No. of Columns in Dataset',
+                        'Distance Metric for Initial Split',
+                        'Rejection Threshold (c)',
+                        'Split Conclusion')
         table.data <- data.frame(
             Attribute = table.rows,
             Value = table.data
@@ -184,10 +204,12 @@ diagnose <- function(dataset.name,
     }
 
     if (save.plots){
-        filename <- paste0(output.dir, "/", dataset.name, "_stats.csv")
+        filename <- paste0(output.dir, "/", dataset.name, "_stats_", n.simulation , ".csv")
+        print(paste0("Simulation #", n.simulation, " results saved @ ", filename))
         write.csv(table.data, file = filename, row.names = FALSE)
     }
 
-    print(table.data)
+    print.data.frame(table.data)
+    formattable::formattable(table.data)
 }
 

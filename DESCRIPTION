@@ -18,4 +18,5 @@ Imports:
     fpc,
     stats,
     reshape2,
-    stringr
+    stringr,
+    formattable

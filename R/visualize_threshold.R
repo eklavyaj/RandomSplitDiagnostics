@@ -23,15 +23,11 @@ visualize_threshold <- function(dataset.name,
                                 output.dir = "Output"){
 
     initial.distance <- initial.scores[3]
-
     c <- get_one_sided_threshold(d.vec, alpha)
 
-    # accept or reject null hypothesis based on above gotten threshold value
-    if (initial.distance >= c){
-        split.conclusion <- "Rejected"
+    if (initial.distance > c){
         subtitle <- paste("Null Hypothesis Rejected")
-    } else{
-        split.conclusion <- "Accepted"
+    } else {
         subtitle <- paste("Null Hypothesis Accepted")
     }
 
@@ -46,7 +42,7 @@ visualize_threshold <- function(dataset.name,
 
     str1 <- paste("Threshold = ", round(c, 2))
     str2 <- paste("Initial Distance = ", round(initial.distance, 2))
-    caption <- paste(str1, ",",str2)
+    caption <- paste0(str1, ", ",str2)
     threshold.plot <- density.plot +
         ggplot2::geom_area(data = df.to_fill[df.to_fill$x <= c, ],
                            ggplot2::aes(x = x, y = y),
@@ -69,21 +65,14 @@ visualize_threshold <- function(dataset.name,
                       y = "Density",
                       title = "Parameter Evaluation Plot" ,
                       subtitle = paste(subtitle, ':', caption)) +
-        ggplot2::theme(plot.subtitle = ggplot2::element_text(color = "red", size = 9),
+        ggplot2::theme(text = ggplot2::element_text(size = 8),
+                       plot.subtitle = ggplot2::element_text(color = "red", size = 10),
                        title = ggplot2::element_text(size = 12),
                        legend.text = ggplot2::element_text(size = 10),
-                       axis.text = ggplot2::element_text(size = 7),
-                       legend.title = ggplot2::element_text(face = "bold"))
-
+                       axis.text = ggplot2::element_text(size = 9),
+                       legend.title = ggplot2::element_text(face = "bold"),
+                       legend.box = "vertical")
 
     print(threshold.plot)
-
-
-    if (save.plots){
-        filename <- paste0(output.dir, "/", dataset.name, "_threshold_plot.pdf")
-        ggplot2::ggsave(filename, plot = threshold.plot, bg = "white", width = 7.08, height = 3.94)
-        print(paste("Threshold Plot saved @", filename))
-    }
-
-    return(split.conclusion)
+    return(threshold.plot)
 }

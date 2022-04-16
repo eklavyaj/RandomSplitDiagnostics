@@ -2,16 +2,17 @@
 % Please edit documentation in R/simulate.R
 \name{simulate}
 \alias{simulate}
-\title{Title}
+\title{Title Simulates random splits and performs hypothesis testing}
 \usage{
 simulate(
+  n.simulation,
   dataset.name,
   df.train,
   df.test,
   num.simulations,
   model.relation,
   split.percentage,
-  initial.scores,
+  initial.scores = c(),
   alpha,
   save.plots = TRUE,
   output.dir,
@@ -45,5 +46,5 @@ simulate(
 
 }
 \description{
-Title
+Title Simulates random splits and performs hypothesis testing
 }
