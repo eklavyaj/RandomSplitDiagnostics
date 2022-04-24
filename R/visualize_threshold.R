@@ -24,11 +24,12 @@ visualize_threshold <- function(dataset.name,
 
     initial.distance <- initial.scores[3]
     c <- get_one_sided_threshold(d.vec, alpha)
+    p.val <- get_pval(d.vec, initial.distance)
 
     if (initial.distance > c){
-        subtitle <- paste("Null Hypothesis Rejected")
+        subtitle <- paste("Rejected")
     } else {
-        subtitle <- paste("Null Hypothesis Accepted")
+        subtitle <- paste("Accepted")
     }
 
     df.distance <- data.frame(distance = d.vec)
@@ -40,9 +41,10 @@ visualize_threshold <- function(dataset.name,
                              y = ggplot2::ggplot_build(density.plot)$data[[1]]$y)
 
 
-    str1 <- paste("Threshold = ", round(c, 2))
-    str2 <- paste("Initial Distance = ", round(initial.distance, 2))
-    caption <- paste0(str1, ", ",str2)
+    str1 <- paste0("p-value = ", round(p.val, 4))
+    str2 <- paste0("Threshold = ", round(c, 2))
+    str3 <- paste0("Test Statistic = ", round(initial.distance, 2))
+    caption <- paste0(str1, ", ", str2, ", ", str3)
     threshold.plot <- density.plot +
         ggplot2::geom_area(data = df.to_fill[df.to_fill$x <= c, ],
                            ggplot2::aes(x = x, y = y),
@@ -53,17 +55,17 @@ visualize_threshold <- function(dataset.name,
         ggplot2::scale_fill_manual(name = "Regions",
                                    values = c("Acceptance" = "#CDE2FA",
                                               "Rejection" = "#FFB16F")) +
-        ggplot2::geom_vline(ggplot2::aes(xintercept = c, colour = "Rejection Threshold"),
+        ggplot2::geom_vline(ggplot2::aes(xintercept = c, colour = "Threshold"),
                             linetype="dashed", size = 1) +
-        ggplot2::geom_vline(ggplot2::aes(xintercept = initial.distance, colour = "Initial Distance"),
+        ggplot2::geom_vline(ggplot2::aes(xintercept = initial.distance, colour = "Test Statistic"),
                             linetype="dashed", size = 1) +
         ggplot2::scale_color_manual(name = "Distances",
-                                    values = c("Rejection Threshold" = "#FF0000",
-                                               "Initial Distance" = "#03B621")) +
-        ggplot2::theme_bw() +
+                                    values = c("Threshold" = "#FF0000",
+                                               "Test Statistic" = "#03B621")) +
+        ggplot2::theme_minimal() +
         ggplot2::labs(x = latex2exp::TeX("Distance $(\\Lambda)$"),
                       y = "Density",
-                      title = "Parameter Evaluation Plot" ,
+                      title = "Hypothesis Testing Plot" ,
                       subtitle = paste(subtitle, ':', caption)) +
         ggplot2::theme(text = ggplot2::element_text(size = 8),
                        plot.subtitle = ggplot2::element_text(color = "red", size = 10),
@@ -71,7 +73,8 @@ visualize_threshold <- function(dataset.name,
                        legend.text = ggplot2::element_text(size = 10),
                        axis.text = ggplot2::element_text(size = 9),
                        legend.title = ggplot2::element_text(face = "bold"),
-                       legend.box = "vertical")
+                       legend.box = "vertical",
+                       axis.line = ggplot2::element_line(size = 0.5))
 
     print(threshold.plot)
     return(threshold.plot)

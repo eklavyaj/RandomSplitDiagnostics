@@ -170,15 +170,17 @@ diagnose <- function(dataset.name,
 
 
     threshold <- as.numeric(results[1])
-    split.conclusion <- results[2]
+    p.val <- as.numeric(results[2])
+    split.conclusion <- results[3]
 
     if(model.relation != ""){
-        table.data <- c(table.data, round(initial.scores[3], 3), round(threshold, 3), deparse(model.relation), metric.performance, round(initial.scores[1], 3), round(initial.scores[2], 3), split.conclusion)
+        table.data <- c(table.data, round(initial.scores[3], 3), round(threshold, 3), round(p.val, 4), deparse(model.relation), metric.performance, round(initial.scores[1], 3), round(initial.scores[2], 3), split.conclusion)
         table.rows <- c('Dataset',
                         'No. of Rows in Dataset',
                         'No. of Columns in Dataset',
                         'Distance Metric for Initial Split',
                         'Rejection Threshold (c)',
+                        'p-value',
                         'Model Relation',
                         'Model Performance Metric',
                         'Model Performance for Initial Train Split',
@@ -190,12 +192,13 @@ diagnose <- function(dataset.name,
         )
     }
     else{
-        table.data <- c(table.data, round(initial.scores[3], 3), round(threshold, 3), split.conclusion)
+        table.data <- c(table.data, round(initial.scores[3], 3), round(threshold, 3), round(p.val, 4), split.conclusion)
         table.rows <- c('Dataset',
                         'No. of Rows in Dataset',
                         'No. of Columns in Dataset',
                         'Distance Metric for Initial Split',
                         'Rejection Threshold (c)',
+                        'p-value',
                         'Split Conclusion')
         table.data <- data.frame(
             Attribute = table.rows,

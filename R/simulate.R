@@ -108,6 +108,7 @@ simulate <- function(n.simulation,
 
     initial.distance <- initial.scores[3]
     c <- get_one_sided_threshold(distance, alpha)
+    p.val <- get_pval(distance, initial.distance)
 
     if (initial.distance > c){
         split.conclusion <- "Rejected"
@@ -115,6 +116,6 @@ simulate <- function(n.simulation,
         split.conclusion <- "Accepted"
     }
 
-    return(c(c, split.conclusion))
+    return(c(c, p.val, split.conclusion))
 
 }

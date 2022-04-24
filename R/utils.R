@@ -23,6 +23,14 @@ calculate_distance <- function(train, test){
     d <- (d1 + d2)/2
 
     return(d)
+
+    # comb <- rbind(train, test)
+    # cov.comb <- cov(comb)
+    # mu.comb <- colMeans(comb)
+    #
+    # d1 <- mean(mahalanobis(test, mu.comb, cov.comb))
+    #
+    # return(d1)
 }
 
 
@@ -112,4 +120,9 @@ get_two_sided_threshold <- function(d, alpha){
     return(c(c1, c2))
 }
 
-# get_pval <- function()
+get_pval <- function(d, initial.distance){
+
+    l <- length(d)
+    p.val <- sum(d > initial.distance)/l
+    return(p.val)
+}
