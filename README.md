@@ -22,13 +22,17 @@ df_train <- abalone[s, ]
 df_test <- abalone[-s, ]
 
 # defining model relation based on variables of data
-model_relation <- WholeWeight ~ Height + LongestShell + Diameter
+model.relation <- Rings ~ LongestShell + Diameter + Height
 
 # function call
-diagnose(dataset_name, df_train, df_test, model_relation)
+diagnose(dataset.name, df.train, df.test, model.relation = model.relation,
+ metric.performance = "Normalized AIC", num.simulations = 200,
+  alpha = 0.05, save.plots = TRUE, output.dir = "Output")
   
 ```
 
 ## Output Plot
 
-![WholeWeight ~ Height + LongestShell + Diameter_diagnose](https://user-images.githubusercontent.com/50804314/157613690-e3baef1d-73d2-4963-a1e3-09f42290821b.png)
+[Abalone_1.pdf](https://github.com/eklavyaj/RandomSplitDiagnostics/files/8589188/Abalone_1.pdf)
+![sample_table](https://user-images.githubusercontent.com/50804314/165907822-dfb0c6e9-d8d6-4f9a-a0f7-a13aace1d4ac.png)
+
