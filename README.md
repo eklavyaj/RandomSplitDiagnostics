@@ -33,6 +33,5 @@ diagnose(dataset.name, df.train, df.test, model.relation = model.relation,
 
 ## Output Plot
 
-[Abalone_1.pdf](https://github.com/eklavyaj/RandomSplitDiagnostics/files/8589188/Abalone_1.pdf)
+![sample_plot](https://user-images.githubusercontent.com/50804314/165908345-c02c9ca0-cc4b-472e-83c6-725157ad2bc0.png)
 ![sample_table](https://user-images.githubusercontent.com/50804314/165907822-dfb0c6e9-d8d6-4f9a-a0f7-a13aace1d4ac.png)
-
